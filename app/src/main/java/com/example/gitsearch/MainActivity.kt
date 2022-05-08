@@ -19,7 +19,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,12 +31,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             GitSearchTheme {
-                UserDetail()
+                RepoDetail()
             }
         }
     }
 }
 
+@Preview
 @Composable
 fun SearchScreen() {
     val scaffoldState = rememberScaffoldState()
@@ -56,13 +56,22 @@ fun SearchScreen() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TextField(value = textFieldState, onValueChange = {
-                textFieldState = it
-            }, label = {
-                Text("Enter a username to search")
-            },
+            TextField(
+                value = textFieldState,
+                onValueChange = {
+                    textFieldState = it
+                },
+                label = {
+                    Text("Enter a username to search")
+                },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_search_24),
+                        contentDescription = "Search icon"
+                    )
+                }
             )
             Spacer(modifier = Modifier.padding(16.dp))
             Button(onClick = {/*TODO add onClick action*/ }) {
@@ -76,44 +85,48 @@ fun SearchScreen() {
 @Composable
 fun UserDetail() {
     val painter = painterResource(id = R.drawable.ic_launcher_foreground)
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Row(
+    val scaffoldState = rememberScaffoldState()
+    Scaffold(scaffoldState = scaffoldState, modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Image(
-                painter = painter,
-                contentDescription = "User avatar",
-                contentScale = ContentScale.Crop,
+            Row(
                 modifier = Modifier
-                    .clip(CircleShape)
-                    .background(Color.Green)
-                    .border(
-                        5.dp, Color.Black,
-                        CircleShape
-                    )
-            )
-            Column {
-                Text(text = "Username", modifier = Modifier.padding(16.dp), fontSize = 20.sp)
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = "User avatar",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(Color.Green)
+                        .border(
+                            5.dp, Color.Black,
+                            CircleShape
+                        )
+                )
+                Column {
+                    Text(text = "Username", modifier = Modifier.padding(16.dp), fontSize = 20.sp)
+                }
             }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Repositories:")
-        Row {
-            LazyColumn {
-                items(mockData.size) {
-                    RepoItem(mockData[it])
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Repositories:")
+            Row {
+                LazyColumn {
+                    items(mockData.size) {
+                        RepoItem(mockData[it])
+                    }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun RepoItem(text: String) {
@@ -127,15 +140,53 @@ fun RepoItem(text: String) {
             }, elevation = 8.dp
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
-            Text(text, fontWeight = FontWeight.Bold, color = Color.Blue, fontSize = 16.sp)
-            Text("updated x days ago")
+            Text(text, style = MaterialTheme.typography.h6, color = Color.Blue)
+            Text("updated x days ago", style = MaterialTheme.typography.body2)
         }
     }
 }
 
+@Preview
 @Composable
 fun RepoDetail() {
+    val mockCommits = listOf("commit1", "commit2", "commit3")
+    val mockBranches = listOf("main", "devel", "feature/user-interface")
+    val scaffoldState = rememberScaffoldState()
+    Scaffold(scaffoldState = scaffoldState, modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+            ) {
+                Text("Repo name placeholder", style = MaterialTheme.typography.h5)
+            }
+            LazyColumn {
+                items(mockBranches.size) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp)
+                            .padding(0.dp, 8.dp), elevation = 8.dp
+                    ) {
+                        Text(text = mockBranches[it])
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Last 10 commits:", style = MaterialTheme.typography.h5)
+            LazyColumn {
 
+                items(mockCommits.size) {
+                    Text(text = mockCommits[it])
+                }
+            }
+        }
+    }
 }
 
 @Composable
