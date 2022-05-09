@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Git Search</string>
+    <string name="search_icon_description">Search icon</string>
+    <string name="search">Search</string>
+    <string name="username_prompt">Enter a username to search</string>
+    <string name="last_ten_commits">Last 10 commits:</string>
+    <string name="user_avatar">User avatar</string>
+    <string name="repositories">Repositories:</string>
 </resources>
