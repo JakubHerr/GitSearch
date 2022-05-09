@@ -3,8 +3,9 @@ package com.example.gitsearch.data.remote.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class BranchDto(
+data class RepoDto(
+    val id: Long,
     val name: String,
-    //TODO add information about the last commit
-    val protected: Boolean
+    val description: String?,
+    val language: String?
 )

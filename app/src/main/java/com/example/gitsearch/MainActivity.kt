@@ -22,11 +22,9 @@ class MainActivity : ComponentActivity() {
 
         //short demo of GitHubApi
         lifecycleScope.launchWhenCreated {
-            GitHubApi.getBranches().let { list ->
+            GitHubApi.getBranches("JakubHerr", "GitSearch").let { list ->
                 list.forEach { branch ->
-                    branch?.let {
-                        Log.d("API demo", "Retrieved a branch named ${branch.name}")
-                    }
+                    Log.d("API demo", "Retrieved a branch named ${branch.name}")
                 }
             }
         }
