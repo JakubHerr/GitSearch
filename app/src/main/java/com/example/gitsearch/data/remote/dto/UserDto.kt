@@ -1,5 +1,8 @@
-package com.example.gitsearch.data.remote
+package com.example.gitsearch.data.remote.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class UserDto(
     val login: String,
     val id: Long,
