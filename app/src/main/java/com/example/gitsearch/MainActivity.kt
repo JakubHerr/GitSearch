@@ -21,10 +21,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //calling API to verify koin injection
+        //calling API to validate error catching
         lifecycleScope.launchWhenCreated {
-            api.getUser("JakubHerr")?.let {
-                Log.d("Injected API test", "API returned a user: $it")
+            val response = api.getUser("asdfgcniagoangajkwf")
+
+            response.data?.let {
+                Log.d("API test", "2xx response received, data: $it")
+            }
+            response.message?.let {
+                Log.d("API test", it)
             }
         }
 

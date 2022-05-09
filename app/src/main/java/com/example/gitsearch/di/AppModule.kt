@@ -17,6 +17,8 @@ val AppModule = module {
                     ignoreUnknownKeys = true
                 })
             }
+            //responses without 2xx code will throw an exception
+            expectSuccess = true
         }
     }
     single<GithubService> {
