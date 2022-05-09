@@ -3,41 +3,36 @@ package com.example.gitsearch
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.gitsearch.ui.Navigation
 import com.example.gitsearch.ui.theme.GitSearchTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            GitSearchTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Greeting("Android")
-                }
-            }
+            MyApp()
         }
     }
 }
 
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
+fun MyApp() {
+    val scaffoldState = rememberScaffoldState()
+    val navController = rememberNavController()
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
     GitSearchTheme {
-        Greeting("Android")
+        Scaffold(scaffoldState = scaffoldState) {
+            Navigation(navController = navController)
+        }
     }
 }
+
+
+
+
+
+
