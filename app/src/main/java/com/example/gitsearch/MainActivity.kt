@@ -9,24 +9,27 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import com.example.gitsearch.data.remote.GitHubApi
+import com.example.gitsearch.data.remote.GithubService
 import com.example.gitsearch.ui.Navigation
 import com.example.gitsearch.ui.theme.GitSearchTheme
+import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
+
+    private val api by inject<GithubService>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            MyApp()
+
+        //calling API to verify koin injection
+        lifecycleScope.launchWhenCreated {
+            api.getUser("JakubHerr")?.let {
+                Log.d("Injected API test", "API returned a user: $it")
+            }
         }
 
-        //short demo of GitHubApi
-        lifecycleScope.launchWhenCreated {
-            GitHubApi.getBranches("JakubHerr", "GitSearch").let { list ->
-                list.forEach { branch ->
-                    Log.d("API demo", "Retrieved a branch named ${branch.name}")
-                }
-            }
+        setContent {
+            MyApp()
         }
     }
 }
