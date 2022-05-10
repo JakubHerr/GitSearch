@@ -2,6 +2,8 @@ package com.example.gitsearch.di
 
 import com.example.gitsearch.data.remote.GithubService
 import com.example.gitsearch.data.remote.GithubServiceImpl
+import com.example.gitsearch.data.repository.MainRepository
+import com.example.gitsearch.data.repository.MainRepositoryImpl
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -23,5 +25,8 @@ val AppModule = module {
     }
     single<GithubService> {
         GithubServiceImpl(get())
+    }
+    single<MainRepository> {
+        MainRepositoryImpl(get())
     }
 }
