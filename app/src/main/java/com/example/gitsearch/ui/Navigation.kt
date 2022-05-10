@@ -1,6 +1,5 @@
 package com.example.gitsearch.ui
 
-import android.util.Log
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -27,13 +26,7 @@ fun Navigation() {
         NavHost(navController = navController, startDestination = Screen.Search.route) {
 
             composable(Screen.Search.route) {
-                SearchScreen(
-                    onSearch = {
-                        Log.d("SearchScreen", "Searched for '$it'")
-                        viewModel.getUser(it) //TODO validate user input
-                        //TODO pass username to UserDetail screen
-                        //navController.navigate(Screen.UserDetail.route)
-                    })
+                SearchScreen(viewModel)
             }
 
             composable(Screen.UserDetail.route) {

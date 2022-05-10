@@ -1,6 +1,6 @@
 package com.example.gitsearch.data.util
 
-sealed class Response<T>(
+open class Response<T>(
     val data: T? = null,
     val message: String? = null
 ) {

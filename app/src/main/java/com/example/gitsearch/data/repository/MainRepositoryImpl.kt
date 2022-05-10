@@ -19,7 +19,7 @@ class MainRepositoryImpl(private val api: GithubService) : MainRepository {
         } catch (e: ResponseException) {
             emit(Response.Error(getErrorMessage(e.response.status.value)))
         } catch (e: IOException) {
-            emit(Response.Error("IOException (No internet?)"))
+            emit(Response.Error("Please check your internet connection"))
         } catch (e: Exception) {
             emit(Response.Error("Unspecified exception"))
         }
@@ -33,7 +33,7 @@ class MainRepositoryImpl(private val api: GithubService) : MainRepository {
         } catch (e: ResponseException) {
             emit(Response.Error(getErrorMessage(e.response.status.value)))
         } catch (e: IOException) {
-            emit(Response.Error("IOException (No internet?)"))
+            emit(Response.Error("Please check your internet connection"))
         } catch (e: Exception) {
             emit(Response.Error("Unspecified exception"))
         }
@@ -48,7 +48,7 @@ class MainRepositoryImpl(private val api: GithubService) : MainRepository {
             } catch (e: ResponseException) {
                 emit(Response.Error(getErrorMessage(e.response.status.value)))
             } catch (e: IOException) {
-                emit(Response.Error("IOException (No internet?)"))
+                emit(Response.Error("Please check your internet connection"))
             } catch (e: Exception) {
                 emit(Response.Error("Unspecified exception"))
             }
@@ -63,7 +63,7 @@ class MainRepositoryImpl(private val api: GithubService) : MainRepository {
             } catch (e: ResponseException) {
                 emit(Response.Error(getErrorMessage(e.response.status.value)))
             } catch (e: IOException) {
-                emit(Response.Error("IOException (No internet?)"))
+                emit(Response.Error("Please check your internet connection"))
             } catch (e: Exception) {
                 emit(Response.Error("Unspecified exception"))
             }
