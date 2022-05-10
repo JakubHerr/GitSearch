@@ -14,7 +14,6 @@ import java.io.IOException
 class MainRepositoryImpl(private val api: GithubService) : MainRepository {
     override fun getUser(user: String): Flow<Response<UserDto>> = flow {
         emit(Response.Loading())
-
         try {
             emit(Response.Success(api.getUser(user)))
         } catch (e: ResponseException) {
@@ -26,17 +25,49 @@ class MainRepositoryImpl(private val api: GithubService) : MainRepository {
         }
     }
 
-    override fun getUserRepos(user: String): Flow<Response<List<RepoDto>>> {
-        TODO("Not yet implemented")
+    override fun getUserRepos(user: String): Flow<Response<List<RepoDto>>> = flow {
+        emit(Response.Loading())
+
+        try {
+            emit(Response.Success(api.getRepos(user)))
+        } catch (e: ResponseException) {
+            emit(Response.Error(getErrorMessage(e.response.status.value)))
+        } catch (e: IOException) {
+            emit(Response.Error("IOException (No internet?)"))
+        } catch (e: Exception) {
+            emit(Response.Error("Unspecified exception"))
+        }
     }
 
-    override fun getRepoBranches(user: String, repo: String): Flow<Response<List<BranchDto>>> {
-        TODO("Not yet implemented")
-    }
+    override fun getRepoBranches(user: String, repo: String): Flow<Response<List<BranchDto>>> =
+        flow {
+            emit(Response.Loading())
 
-    override fun getRepoCommits(user: String, repo: String): Flow<Response<List<CommitDto>>> {
-        TODO("Not yet implemented")
-    }
+            try {
+                emit(Response.Success(api.getBranches(user, repo)))
+            } catch (e: ResponseException) {
+                emit(Response.Error(getErrorMessage(e.response.status.value)))
+            } catch (e: IOException) {
+                emit(Response.Error("IOException (No internet?)"))
+            } catch (e: Exception) {
+                emit(Response.Error("Unspecified exception"))
+            }
+        }
+
+    override fun getRepoCommits(user: String, repo: String): Flow<Response<List<CommitDto>>> =
+        flow {
+            emit(Response.Loading())
+
+            try {
+                emit(Response.Success(api.getCommits(user, repo)))
+            } catch (e: ResponseException) {
+                emit(Response.Error(getErrorMessage(e.response.status.value)))
+            } catch (e: IOException) {
+                emit(Response.Error("IOException (No internet?)"))
+            } catch (e: Exception) {
+                emit(Response.Error("Unspecified exception"))
+            }
+        }
 
     private fun getErrorMessage(statusCode: Int): String? = when (statusCode) {
         in 300..399 -> "Redirect response exception"
