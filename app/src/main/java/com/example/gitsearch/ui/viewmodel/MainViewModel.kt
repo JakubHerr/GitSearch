@@ -4,9 +4,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gitsearch.data.remote.dto.BranchDto
-import com.example.gitsearch.data.remote.dto.CommitDto
 import com.example.gitsearch.data.remote.dto.RepoDto
 import com.example.gitsearch.data.remote.dto.UserDto
+import com.example.gitsearch.data.remote.dto.commit.CommitDto
 import com.example.gitsearch.data.repository.MainRepository
 import com.example.gitsearch.data.util.Response
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +39,7 @@ class MainViewModel(private val repository: MainRepository) : ViewModel() {
         }
     }
 
-    fun getRepos(user: String) {
+    private fun getRepos(user: String) {
         viewModelScope.launch {
             repository.getUserRepos(user).collect {
                 _repoList.value = it
@@ -47,7 +47,7 @@ class MainViewModel(private val repository: MainRepository) : ViewModel() {
         }
     }
 
-    fun getCommits(user: String, repo: String) {
+    private fun getCommits(user: String, repo: String) {
         viewModelScope.launch {
             repository.getRepoCommits(user, repo).collect {
                 _commitList.value = it
@@ -55,7 +55,7 @@ class MainViewModel(private val repository: MainRepository) : ViewModel() {
         }
     }
 
-    fun getBranches(user: String, repo: String) {
+    private fun getBranches(user: String, repo: String) {
         viewModelScope.launch {
             repository.getRepoBranches(user, repo).collect {
                 _branchList.value = it
@@ -67,6 +67,11 @@ class MainViewModel(private val repository: MainRepository) : ViewModel() {
         _validUser.value = false
         //onNavigateToUser can only trigger if a valid response with data was received
         getRepos(_user.value.data!!.login)
+    }
+
+    fun onNavigateToRepo(repo: String) {
+        getCommits(_user.value.data!!.login, repo)
+        getBranches(_user.value.data!!.login, repo)
     }
 
     //TODO try to replace with a RegEx or write more Kotlin-style

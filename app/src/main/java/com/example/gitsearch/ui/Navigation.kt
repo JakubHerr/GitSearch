@@ -21,7 +21,6 @@ import org.koin.androidx.compose.getViewModel
 fun Navigation() {
     val scaffoldState = rememberScaffoldState()
     val navController = rememberNavController()
-    //quick test of viewModel injection
     val viewModel = getViewModel<MainViewModel>()
 
     Scaffold(scaffoldState = scaffoldState) {
@@ -45,18 +44,23 @@ fun Navigation() {
                     viewModel = viewModel,
                     painterResource(id = R.drawable.ic_launcher_foreground),
                     onClickRepo = {
-                        navController.navigate(Screen.RepoDetail.route) //TODO pass repository name to RepoDetail
+                        viewModel.onNavigateToRepo(it)
+                        navController.navigate("${Screen.RepoDetail.route}/$it")
                     })
             }
 
-            composable(Screen.RepoDetail.route) {
-                RepoDetail()
+            composable(route = "${Screen.RepoDetail.route}/{repoName}",
+                arguments = listOf(
+                    navArgument("repoName") {
+                        type = NavType.StringType
+                    }
+                )) {
+                RepoDetail(viewModel = viewModel)
             }
 
             composable(Screen.About.route) {
                 AboutScreen()
             }
-
         }
     }
 }

@@ -36,7 +36,6 @@ fun SearchScreen(viewModel: MainViewModel, onValidUser: (String) -> Unit) {
         if (userState is Response.Loading) {
             CircularProgressIndicator()
         }
-
         TextField(
             value = textFieldState,
             onValueChange = {

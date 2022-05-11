@@ -1,9 +1,9 @@
 package com.example.gitsearch.data.remote
 
 import com.example.gitsearch.data.remote.dto.BranchDto
-import com.example.gitsearch.data.remote.dto.CommitDto
 import com.example.gitsearch.data.remote.dto.RepoDto
 import com.example.gitsearch.data.remote.dto.UserDto
+import com.example.gitsearch.data.remote.dto.commit.CommitDto
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

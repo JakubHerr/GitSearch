@@ -2,9 +2,9 @@ package com.example.gitsearch.data.repository
 
 import com.example.gitsearch.data.remote.GithubService
 import com.example.gitsearch.data.remote.dto.BranchDto
-import com.example.gitsearch.data.remote.dto.CommitDto
 import com.example.gitsearch.data.remote.dto.RepoDto
 import com.example.gitsearch.data.remote.dto.UserDto
+import com.example.gitsearch.data.remote.dto.commit.CommitDto
 import com.example.gitsearch.data.util.Response
 import io.ktor.client.plugins.*
 import kotlinx.coroutines.flow.Flow
