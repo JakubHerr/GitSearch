@@ -41,9 +41,12 @@ fun Navigation() {
                         type = NavType.StringType
                     })
             ) {
-                UserDetail(painterResource(id = R.drawable.ic_launcher_foreground), onClickRepo = {
-                    navController.navigate(Screen.RepoDetail.route) //TODO pass repository name to RepoDetail
-                })
+                UserDetail(
+                    viewModel = viewModel,
+                    painterResource(id = R.drawable.ic_launcher_foreground),
+                    onClickRepo = {
+                        navController.navigate(Screen.RepoDetail.route) //TODO pass repository name to RepoDetail
+                    })
             }
 
             composable(Screen.RepoDetail.route) {

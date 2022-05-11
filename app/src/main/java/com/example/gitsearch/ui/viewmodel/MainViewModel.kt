@@ -63,8 +63,10 @@ class MainViewModel(private val repository: MainRepository) : ViewModel() {
         }
     }
 
-    fun onNavigate() {
+    fun onNavigateToUser() {
         _validUser.value = false
+        //onNavigateToUser can only trigger if a valid response with data was received
+        getRepos(_user.value.data!!.login)
     }
 
     //TODO try to replace with a RegEx or write more Kotlin-style
