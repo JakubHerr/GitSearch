@@ -1,5 +1,6 @@
 package com.example.gitsearch.ui.viewmodel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gitsearch.data.remote.dto.BranchDto
@@ -25,11 +26,15 @@ class MainViewModel(private val repository: MainRepository) : ViewModel() {
     private var _commitList = MutableStateFlow(Response<List<CommitDto>>())
     val commitList: StateFlow<Response<List<CommitDto>>> get() = _commitList
 
+    private var _validUser = mutableStateOf(false)
+    val validUser get() = _validUser
+
 
     fun getUser(user: String) {
         viewModelScope.launch {
             repository.getUser(user).collect {
                 _user.value = it
+                if (it is Response.Success) _validUser.value = true
             }
         }
     }
@@ -56,5 +61,20 @@ class MainViewModel(private val repository: MainRepository) : ViewModel() {
                 _branchList.value = it
             }
         }
+    }
+
+    fun onNavigate() {
+        _validUser.value = false
+    }
+
+    //TODO try to replace with a RegEx or write more Kotlin-style
+    //a valid username is max 39 characters long alphanumeric string
+    //it can contain hyphens (-) but can not start or end with a hyphen
+    //it can not contain a double hyphen (--)
+    fun validateUsername(username: String): Boolean {
+        if (username.length > 39 || username.isEmpty()) return false
+        if (username.startsWith("-") || username.endsWith("-")) return false
+        if (username.contains("--")) return false
+        return true
     }
 }

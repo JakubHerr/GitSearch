@@ -16,11 +16,15 @@ import com.example.gitsearch.R
 import com.example.gitsearch.ui.viewmodel.MainViewModel
 
 @Composable
-fun SearchScreen(viewModel: MainViewModel) {
+fun SearchScreen(viewModel: MainViewModel, onValidUser: (String) -> Unit) {
     var textFieldState by rememberSaveable {
         mutableStateOf("")
     }
     val userState by viewModel.user.collectAsState()
+    val navigate by viewModel.validUser
+    var errorMessage by remember {
+        mutableStateOf("")
+    }
 
     Column(
         modifier = Modifier
@@ -29,7 +33,14 @@ fun SearchScreen(viewModel: MainViewModel) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "${userState.data?.id ?: userState.message ?: ""}") //TODO remove debug text
+        Text(text = errorMessage) //TODO replace with TextField error message
+
+        if (navigate) LaunchedEffect(Unit) {
+            viewModel.onNavigate()
+            onValidUser(userState.data!!.login)
+        }
+
+
         TextField(
             value = textFieldState,
             onValueChange = {
@@ -48,7 +59,12 @@ fun SearchScreen(viewModel: MainViewModel) {
             }
         )
         Spacer(modifier = Modifier.padding(16.dp))
-        Button(onClick = { viewModel.getUser(textFieldState) }) {
+        Button(onClick = {
+            if (viewModel.validateUsername(textFieldState)) viewModel.getUser(textFieldState)
+            else {
+                errorMessage = "You have entered an invalid username"
+            }
+        }) {
             Text(stringResource(R.string.search))
         }
     }

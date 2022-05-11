@@ -4,9 +4,11 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.gitsearch.R
 import com.example.gitsearch.ui.screen.AboutScreen
 import com.example.gitsearch.ui.screen.RepoDetail
@@ -25,13 +27,22 @@ fun Navigation() {
     Scaffold(scaffoldState = scaffoldState) {
         NavHost(navController = navController, startDestination = Screen.Search.route) {
 
-            composable(Screen.Search.route) {
-                SearchScreen(viewModel)
+            composable(Screen.Search.route)
+            {
+                SearchScreen(viewModel) {
+                    navController.navigate("${Screen.UserDetail.route}/$it")
+                }
             }
 
-            composable(Screen.UserDetail.route) {
+            composable(
+                route = "${Screen.UserDetail.route}/{username}",
+                arguments = listOf(
+                    navArgument("username") {
+                        type = NavType.StringType
+                    })
+            ) {
                 UserDetail(painterResource(id = R.drawable.ic_launcher_foreground), onClickRepo = {
-                    navController.navigate(Screen.RepoDetail.route)
+                    navController.navigate(Screen.RepoDetail.route) //TODO pass repository name to RepoDetail
                 })
             }
 
