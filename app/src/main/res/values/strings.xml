@@ -6,4 +6,5 @@
     <string name="last_ten_commits">Last 10 commits:</string>
     <string name="user_avatar">User avatar</string>
     <string name="repositories">Repositories:</string>
+    <string name="invalid_username">You have entered an invalid username</string>
 </resources>
