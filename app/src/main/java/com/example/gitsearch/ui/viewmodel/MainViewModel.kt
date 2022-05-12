@@ -74,14 +74,13 @@ class MainViewModel(private val repository: MainRepository) : ViewModel() {
         getBranches(_user.value.data!!.login, repo)
     }
 
-    //TODO try to replace with a RegEx or write more Kotlin-style
     //a valid username is max 39 characters long alphanumeric string
     //it can contain hyphens (-) but can not start or end with a hyphen
     //it can not contain a double hyphen (--)
     fun validateUsername(username: String): Boolean {
-        if (username.length > 39 || username.isEmpty()) return false
         if (username.startsWith("-") || username.endsWith("-")) return false
         if (username.contains("--")) return false
+        if (!username.matches(Regex("[a-z-]{0,38}", RegexOption.IGNORE_CASE))) return false
         return true
     }
 }

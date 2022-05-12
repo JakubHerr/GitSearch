@@ -1,13 +1,13 @@
 package com.example.gitsearch.ui.screen
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,13 +19,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gitsearch.R
 import com.example.gitsearch.data.remote.dto.RepoDto
 import com.example.gitsearch.data.remote.dto.UserDto
 import com.example.gitsearch.data.util.Response
+import com.example.gitsearch.ui.core.ListItem
 import com.example.gitsearch.ui.viewmodel.MainViewModel
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.datetime.toInstant
@@ -43,7 +43,12 @@ fun UserDetailScreen(viewModel: MainViewModel, onClickRepo: (String) -> Unit) {
             .padding(8.dp)
     ) {
         UserProfile(response = user)
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(
+            modifier = Modifier
+                .height(2.dp)
+                .fillMaxWidth()
+                .background(Color.Black)
+        )
         RepoList(response = repos, onClickRepo = onClickRepo)
     }
 }
@@ -51,15 +56,29 @@ fun UserDetailScreen(viewModel: MainViewModel, onClickRepo: (String) -> Unit) {
 @Composable
 fun UserProfile(response: Response<UserDto>) {
     var showMore by remember { mutableStateOf(false) }
+
     response.data?.let { user ->
-        Column {
+        val hasExtraInfo = when {
+            user.bio != null -> true
+            user.company != null -> true
+            user.location != null -> true
+            user.email != null -> true
+            else -> false
+        }
+
+        Column(modifier = Modifier.animateContentSize()) {
             BasicUserInfo(user = user)
             if (showMore) {
                 ExtraUserInfo(user = user, modifier = Modifier.padding(0.dp, 8.dp))
             }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                Button(onClick = { showMore = !showMore }) {
-                    Text("Show more")
+            if (hasExtraInfo) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(onClick = { showMore = !showMore }) {
+                        Text(if (showMore) "Show more" else "Show less")
+                    }
                 }
             }
         }
@@ -74,7 +93,6 @@ fun BasicUserInfo(user: UserDto) {
             .wrapContentHeight(),
     ) {
         UserAvatar(url = user.avatarUrl)
-        //PreviewAvatar()
         Column(
             modifier = Modifier
                 .padding(8.dp, 0.dp)
@@ -156,25 +174,6 @@ fun IconText(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewUserProfile() {
-    val mockUser = UserDto(
-        login = "JakubHerr",
-        id = 42,
-        avatarUrl = "https://avatars.githubusercontent.com/u/25185228?v=4",
-        followers = 333,
-        following = 7,
-        bio = "bio placeholder",
-        name = "Jakub Herrmann",
-        company = "Linux",
-        email = "email@seznam.cz",
-        location = "Earth"
-    )
-    val mockResponse = Response.Success(mockUser)
-    UserProfile(response = mockResponse)
-}
-
 @Composable
 fun UserAvatar(url: String) {
     GlideImage(
@@ -183,11 +182,8 @@ fun UserAvatar(url: String) {
             .width(128.dp)
             .height(128.dp)
             .clip(CircleShape)
-            .background(Color.LightGray)
-            .border(3.dp, Color.DarkGray),
-        alignment = Alignment.Center,
+            .background(Color.DarkGray),
         contentScale = ContentScale.Crop,
-        previewPlaceholder = R.drawable.ic_launcher_background,
         loading = {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         },
@@ -230,22 +226,30 @@ fun RepoList(response: Response<List<RepoDto>>, onClickRepo: (String) -> Unit) {
 
 @Composable
 fun RepoItem(repo: RepoDto, onClick: (String) -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(128.dp)
-            .padding(8.dp)
-            .clickable {
-                onClick(repo.name) //Mock value for demonstration purposes
-            }, elevation = 8.dp, backgroundColor = Color.LightGray
-    ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(repo.name, style = MaterialTheme.typography.h6, color = Color.Blue)
-            //not a very efficient way to turn an ISO 8601 date string into a different string
-            //TODO look for a better solution
-            val date = SimpleDateFormat("MMM dd yyyy", Locale.US)
-                .format(repo.updatedAt.toInstant().toEpochMilliseconds())
-            Text("Updated on $date", style = MaterialTheme.typography.body2)
+    ListItem(modifier = Modifier
+        .wrapContentHeight()
+        .clickable { onClick(repo.name) }) {
+        Text(
+            text = repo.name,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color.Blue
+        )
+        //not a very efficient way to turn an ISO 8601 date string into a different string
+        //TODO look for a better solution
+        val date = SimpleDateFormat("MMM dd yyyy", Locale.US)
+            .format(repo.updatedAt.toInstant().toEpochMilliseconds())
+
+        Text(
+            text = "Updated on $date",
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        repo.language?.let { language ->
+            when (language) {
+                "Kotlin" -> Text(text = "$language \uD83D\uDC9C")
+                else -> Text(text = language)
+            }
         }
     }
 }
