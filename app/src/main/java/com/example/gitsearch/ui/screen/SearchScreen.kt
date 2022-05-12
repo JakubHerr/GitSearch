@@ -13,6 +13,7 @@ import com.example.gitsearch.R
 import com.example.gitsearch.data.util.Response
 import com.example.gitsearch.ui.viewmodel.MainViewModel
 
+//TODO refactor and show error messages on invalid input/unknown user
 @Composable
 fun SearchScreen(viewModel: MainViewModel, onValidUser: (String) -> Unit) {
     var textFieldState by rememberSaveable {

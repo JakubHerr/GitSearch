@@ -1,16 +1,11 @@
 package com.example.gitsearch.ui.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -20,84 +15,160 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gitsearch.R
+import com.example.gitsearch.data.remote.dto.RepoDto
+import com.example.gitsearch.data.remote.dto.UserDto
 import com.example.gitsearch.data.util.Response
 import com.example.gitsearch.ui.viewmodel.MainViewModel
+import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.datetime.toInstant
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
-fun UserDetail(viewModel: MainViewModel, painter: Painter, onClickRepo: (String) -> Unit) {
+fun UserDetailScreen(viewModel: MainViewModel, onClickRepo: (String) -> Unit) {
     val user by viewModel.user.collectAsState()
     val repos by viewModel.repoList.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
+        UserProfile(response = user)
+        Spacer(modifier = Modifier.height(16.dp))
+        RepoList(response = repos, onClickRepo = onClickRepo)
+    }
+}
+
+@Composable
+fun UserProfile(response: Response<UserDto>) {
+    response.data?.let { user ->
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painter,
-                contentDescription = stringResource(R.string.user_avatar),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(Color.Green)
-                    .border(
-                        5.dp, Color.Black,
-                        CircleShape
-                    )
-            )
-            Column {
-                Text(
-                    text = user.data?.login ?: "",
-                    modifier = Modifier.padding(16.dp),
-                    fontSize = 20.sp
+
+            UserAvatar(url = user.avatarUrl)
+            Column(modifier = Modifier.padding(4.dp, 0.dp)) {
+                if (user.name != null) Text(
+                    text = user.name,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.ExtraBold
                 )
+                Text(
+                    text = user.login,
+                    fontStyle = FontStyle.Italic
+                )
+                IconText(
+                    text = "${user.followers} followers",
+                    contentDescription = "follower icon",
+                    painter = painterResource(id = R.drawable.ic_baseline_people_alt_24)
+                )
+                IconText(
+                    text = "${user.following} following",
+                    contentDescription = "following icon",
+                    painter = painterResource(id = R.drawable.ic_baseline_emoji_people_24)
+                )
+
             }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(stringResource(R.string.repositories))
-        when (repos) {
-            is Response.Success -> Row {
-                LazyColumn {
-                    repos.data?.let { list ->
-                        items(list.size) { idx ->
-                            RepoItem(list[idx].name, onClickRepo)
-                        }
-                    }
-                }
-            }
-            is Response.Loading -> CircularProgressIndicator()
-            is Response.Error -> Text(text = repos.message ?: "Error: no Error message found")
-        }
-        repos.data?.let { list ->
-            if (list.isEmpty()) Text(text = "This user does not have any repositories yet")
         }
     }
 }
 
 @Composable
-fun RepoItem(text: String, onClick: (String) -> Unit) {
+fun IconText(text: String, contentDescription: String, painter: Painter) {
+    Row {
+        Icon(
+            painter = painter,
+            contentDescription = contentDescription,
+            modifier = Modifier.padding(0.dp, 0.dp, 4.dp, 0.dp)
+        )
+        Text(text)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewUserProfile() {
+    val mockUser = UserDto(
+        login = "JakubHerr",
+        id = 42,
+        avatarUrl = "https://avatars.githubusercontent.com/u/25185228?v=4",
+        followers = 333,
+        following = 7,
+        bio = "bio placeholder",
+        name = "Jakub Herrmann",
+        company = "Linux",
+        email = "email@seznam.cz",
+        location = "Earth"
+    )
+    val mockResponse = Response.Success(mockUser)
+    UserProfile(response = mockResponse)
+}
+
+@Composable
+fun UserAvatar(url: String) {
+    //TODO add placeholder and error images
+    GlideImage(
+        imageModel = url,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .width(128.dp)
+            .height(128.dp)
+            .clip(CircleShape)
+            .background(Color.Green)
+    )
+}
+
+@Composable
+fun RepoList(response: Response<List<RepoDto>>, onClickRepo: (String) -> Unit) {
+    Text(stringResource(R.string.repositories))
+    when (response) {
+        is Response.Success -> Row {
+            LazyColumn {
+                response.data?.let { list ->
+                    items(list.size) { idx ->
+                        RepoItem(list[idx], onClickRepo)
+                    }
+                }
+            }
+        }
+        is Response.Loading -> CircularProgressIndicator()
+        is Response.Error -> Text(text = response.message ?: "Error: no Error message found")
+    }
+    response.data?.let { list ->
+        if (list.isEmpty()) Text(text = "This user does not have any repositories yet")
+    }
+}
+
+@Composable
+fun RepoItem(repo: RepoDto, onClick: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(128.dp)
             .padding(8.dp)
             .clickable {
-                onClick(text) //Mock value for demonstration purposes
+                onClick(repo.name) //Mock value for demonstration purposes
             }, elevation = 8.dp
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
-            Text(text, style = MaterialTheme.typography.h6, color = Color.Blue)
-            Text("updated x days ago", style = MaterialTheme.typography.body2)
+            Text(repo.name, style = MaterialTheme.typography.h6, color = Color.Blue)
+            //not a very efficient way to turn an ISO 8601 date string into a different string
+            //TODO look for a better solution
+            val date = SimpleDateFormat("MMM dd yyyy", Locale.US)
+                .format(repo.updatedAt.toInstant().toEpochMilliseconds())
+            Text("Updated on $date", style = MaterialTheme.typography.body2)
         }
     }
 }

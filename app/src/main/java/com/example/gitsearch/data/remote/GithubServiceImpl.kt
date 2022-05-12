@@ -17,7 +17,10 @@ class GithubServiceImpl(private val client: HttpClient) : GithubService {
     }
 
     override suspend fun getRepos(user: String): List<RepoDto> {
-        return client.get { url("$baseUrl/users/$user/repos") }.body()
+        return client.get {
+            url("$baseUrl/users/$user/repos")
+            parameter("sort", "pushed")
+        }.body()
     }
 
     override suspend fun getBranches(user: String, repo: String): List<BranchDto> {
@@ -26,7 +29,10 @@ class GithubServiceImpl(private val client: HttpClient) : GithubService {
     }
 
     override suspend fun getCommits(user: String, repo: String): List<CommitDto> {
-        return client.get { url("$baseUrl/repos/$user/$repo/commits") }.body()
+        return client.get {
+            url("$baseUrl/repos/$user/$repo/commits")
+            parameter("per_page", 10)
+        }.body()
     }
 
     //TODO call the close() method to free resources before exiting app

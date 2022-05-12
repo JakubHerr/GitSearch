@@ -3,17 +3,15 @@ package com.example.gitsearch.ui
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.gitsearch.R
 import com.example.gitsearch.ui.screen.AboutScreen
-import com.example.gitsearch.ui.screen.RepoDetail
+import com.example.gitsearch.ui.screen.RepoDetailScreen
 import com.example.gitsearch.ui.screen.SearchScreen
-import com.example.gitsearch.ui.screen.UserDetail
+import com.example.gitsearch.ui.screen.UserDetailScreen
 import com.example.gitsearch.ui.viewmodel.MainViewModel
 import org.koin.androidx.compose.getViewModel
 
@@ -40,9 +38,8 @@ fun Navigation() {
                         type = NavType.StringType
                     })
             ) {
-                UserDetail(
+                UserDetailScreen(
                     viewModel = viewModel,
-                    painterResource(id = R.drawable.ic_launcher_foreground),
                     onClickRepo = {
                         viewModel.onNavigateToRepo(it)
                         navController.navigate("${Screen.RepoDetail.route}/$it")
@@ -55,7 +52,7 @@ fun Navigation() {
                         type = NavType.StringType
                     }
                 )) {
-                RepoDetail(viewModel = viewModel)
+                RepoDetailScreen(viewModel = viewModel, it.arguments?.getString("repoName"))
             }
 
             composable(Screen.About.route) {
