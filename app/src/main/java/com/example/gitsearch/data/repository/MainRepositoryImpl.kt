@@ -70,11 +70,12 @@ class MainRepositoryImpl(private val api: GithubService) : MainRepository {
         }
 
     private fun getErrorMessage(statusCode: Int): String? = when (statusCode) {
-        in 300..399 -> "Redirect response exception"
+        in 300..399 -> "Redirect response error"
         404 -> "Not found"
         418 -> "The server is a teapot"
-        in 400..499 -> "Client request exception"
-        in 500..599 -> "Server response exception"
+        in 400..499 -> "Client request error"
+        500 -> "Internal server error"
+        in 500..599 -> "Server response error"
         else -> null
     }
 }

@@ -1,14 +1,14 @@
 package com.example.gitsearch.ui.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,44 +50,103 @@ fun UserDetailScreen(viewModel: MainViewModel, onClickRepo: (String) -> Unit) {
 
 @Composable
 fun UserProfile(response: Response<UserDto>) {
+    var showMore by remember { mutableStateOf(false) }
     response.data?.let { user ->
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            UserAvatar(url = user.avatarUrl)
-            Column(modifier = Modifier.padding(4.dp, 0.dp)) {
-                if (user.name != null) Text(
-                    text = user.name,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
-                Text(
-                    text = user.login,
-                    fontStyle = FontStyle.Italic
-                )
-                IconText(
-                    text = "${user.followers} followers",
-                    contentDescription = "follower icon",
-                    painter = painterResource(id = R.drawable.ic_baseline_people_alt_24)
-                )
-                IconText(
-                    text = "${user.following} following",
-                    contentDescription = "following icon",
-                    painter = painterResource(id = R.drawable.ic_baseline_emoji_people_24)
-                )
-
+        Column {
+            BasicUserInfo(user = user)
+            if (showMore) {
+                ExtraUserInfo(user = user, modifier = Modifier.padding(0.dp, 8.dp))
+            }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Button(onClick = { showMore = !showMore }) {
+                    Text("Show more")
+                }
             }
         }
     }
 }
 
 @Composable
-fun IconText(text: String, contentDescription: String, painter: Painter) {
-    Row {
+fun BasicUserInfo(user: UserDto) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+    ) {
+        UserAvatar(url = user.avatarUrl)
+        //PreviewAvatar()
+        Column(
+            modifier = Modifier
+                .padding(8.dp, 0.dp)
+                .wrapContentHeight()
+        ) {
+            if (user.name != null) Text(
+                text = user.name,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Text(
+                text = user.login,
+                fontStyle = FontStyle.Italic
+            )
+            IconText(
+                text = "${user.followers} followers",
+                contentDescription = "follower icon",
+                painter = painterResource(id = R.drawable.ic_baseline_people_alt_24)
+            )
+            IconText(
+                text = "${user.following} following",
+                contentDescription = "following icon",
+                painter = painterResource(id = R.drawable.ic_baseline_emoji_people_24)
+            )
+
+        }
+    }
+}
+
+@Composable
+fun ExtraUserInfo(user: UserDto, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.wrapContentHeight()) {
+        user.bio?.let { Text(text = it) }
+        user.company?.let {
+            IconText(
+                text = it,
+                contentDescription = "company icon",
+                painter = painterResource(
+                    id = R.drawable.ic_baseline_location_city_24
+                ),
+                modifier = Modifier.padding(0.dp, 8.dp)
+            )
+        }
+        user.location?.let {
+            IconText(
+                text = it,
+                contentDescription = "location icon",
+                painter = painterResource(
+                    id = R.drawable.ic_baseline_location_on_24
+                ),
+                modifier = Modifier.padding(0.dp, 8.dp)
+            )
+        }
+        user.email?.let {
+            IconText(
+                text = it, contentDescription = "email icon", painter = painterResource(
+                    id = R.drawable.ic_baseline_email_24
+                ),
+                modifier = Modifier.padding(0.dp, 8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun IconText(
+    text: String,
+    contentDescription: String,
+    painter: Painter,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier) {
         Icon(
             painter = painter,
             contentDescription = contentDescription,
@@ -118,15 +177,27 @@ fun PreviewUserProfile() {
 
 @Composable
 fun UserAvatar(url: String) {
-    //TODO add placeholder and error images
     GlideImage(
         imageModel = url,
-        contentScale = ContentScale.Crop,
         modifier = Modifier
             .width(128.dp)
             .height(128.dp)
             .clip(CircleShape)
-            .background(Color.Green)
+            .background(Color.LightGray)
+            .border(3.dp, Color.DarkGray),
+        alignment = Alignment.Center,
+        contentScale = ContentScale.Crop,
+        previewPlaceholder = R.drawable.ic_launcher_background,
+        loading = {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        },
+        failure = {
+            Image(
+                painter = painterResource(id = R.drawable.ic_baseline_wifi_off_24),
+                contentDescription = "Error image",
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
     )
 }
 
@@ -143,7 +214,13 @@ fun RepoList(response: Response<List<RepoDto>>, onClickRepo: (String) -> Unit) {
                 }
             }
         }
-        is Response.Loading -> CircularProgressIndicator()
+        is Response.Loading -> Box(modifier = Modifier.fillMaxWidth()) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(
+                    Alignment.Center
+                )
+            )
+        }
         is Response.Error -> Text(text = response.message ?: "Error: no Error message found")
     }
     response.data?.let { list ->
@@ -160,7 +237,7 @@ fun RepoItem(repo: RepoDto, onClick: (String) -> Unit) {
             .padding(8.dp)
             .clickable {
                 onClick(repo.name) //Mock value for demonstration purposes
-            }, elevation = 8.dp
+            }, elevation = 8.dp, backgroundColor = Color.LightGray
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(repo.name, style = MaterialTheme.typography.h6, color = Color.Blue)

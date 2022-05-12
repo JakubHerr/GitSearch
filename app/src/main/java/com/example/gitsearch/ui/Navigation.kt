@@ -1,8 +1,13 @@
 package com.example.gitsearch.ui
 
-import androidx.compose.material.Scaffold
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -19,9 +24,15 @@ import org.koin.androidx.compose.getViewModel
 fun Navigation() {
     val scaffoldState = rememberScaffoldState()
     val navController = rememberNavController()
+    val currentScreen = navController.currentDestination?.route
     val viewModel = getViewModel<MainViewModel>()
 
-    Scaffold(scaffoldState = scaffoldState) {
+    Scaffold(scaffoldState = scaffoldState, topBar = {
+        MyAppBar(
+            screenName = "test",
+            onBackPressed = { navController.navigateUp() },
+            onAboutClick = { navController.navigate(Screen.About.route) })
+    }) {
         NavHost(navController = navController, startDestination = Screen.Search.route) {
 
             composable(Screen.Search.route)
@@ -59,5 +70,24 @@ fun Navigation() {
                 AboutScreen()
             }
         }
+    }
+}
+
+@Composable
+fun MyAppBar(screenName: String?, onBackPressed: () -> Unit, onAboutClick: () -> Unit) {
+    TopAppBar(backgroundColor = MaterialTheme.colors.primary) {
+        Icon(
+            Icons.Default.ArrowBack,
+            contentDescription = "Back arrow",
+            modifier = Modifier.clickable {
+                onBackPressed()
+            })
+        Text(text = screenName ?: "") //TODO show screen name
+        Icon(Icons.Default.Info, "About app",
+            modifier = Modifier
+                .fillMaxHeight()
+                .clickable {
+                    onAboutClick()
+                })
     }
 }
