@@ -1,33 +1,31 @@
 package com.example.gitsearch.ui.screen
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.gitsearch.R
+import com.example.gitsearch.data.remote.dto.UserDto
+import com.example.gitsearch.data.util.ErrorMsg
 import com.example.gitsearch.data.util.Response
+import com.example.gitsearch.ui.core.AppLogo
 import com.example.gitsearch.ui.viewmodel.MainViewModel
 
-//TODO refactor and show error messages on invalid input/unknown user
 @Composable
 fun SearchScreen(viewModel: MainViewModel, onValidUser: (String) -> Unit) {
     val userState by viewModel.user.collectAsState()
     val navigate by viewModel.validUser
 
     if (navigate) LaunchedEffect(Unit) {
-        viewModel.onNavigateToUser()
-        onValidUser(userState.data!!.login)
+        Log.d("SearchScreen", "Valid user detected, navigating...")
+        userState.data?.let { onValidUser(it.login) }
     }
 
     Column(
@@ -36,33 +34,50 @@ fun SearchScreen(viewModel: MainViewModel, onValidUser: (String) -> Unit) {
             .padding(16.dp)
             .animateContentSize()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(0.dp, 16.dp)
-        ) {
-            if (userState is Response.Loading) {
+        StatusIndicator(userState = userState)
+        SearchBar(viewModel = viewModel)
+    }
+}
+
+@Composable
+fun StatusIndicator(userState: Response<UserDto>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(0.dp, 16.dp)
+    ) {
+        when (userState) {
+            is Response.Loading -> {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .size(64.dp)
                 )
-            } else {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                    contentDescription = stringResource(R.string.gitsearch_logo_description),
-                    modifier = Modifier
-                        .size(64.dp)
-                        .clip(CircleShape)
-                        .background(Color.Green)
-                        .align(Alignment.CenterHorizontally)
-                )
             }
+            is Response.Error -> {
+                userState.message?.let { errorMsg ->
+                    ErrorCause(
+                        errorMsg = errorMsg,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
+            }
+            else -> AppLogo(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
-
-        SearchBar(viewModel = viewModel)
     }
+}
+
+@Composable
+fun ErrorCause(errorMsg: String, modifier: Modifier = Modifier) {
+    val text = if (errorMsg == ErrorMsg.NotFound.message)
+        stringResource(R.string.user_does_not_exist)
+    else errorMsg
+    Text(
+        text = text,
+        color = MaterialTheme.colorScheme.error,
+        modifier = modifier
+    )
 }
 
 @Composable

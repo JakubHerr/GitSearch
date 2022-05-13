@@ -1,5 +1,6 @@
 package com.example.gitsearch.ui
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -34,7 +35,7 @@ import org.koin.androidx.compose.getViewModel
 fun Navigation() {
     val navController = rememberNavController()
     var currentScreen by rememberSaveable {
-        mutableStateOf("Search")
+        mutableStateOf("")
     }
     val viewModel = getViewModel<MainViewModel>()
 
@@ -43,7 +44,7 @@ fun Navigation() {
             screenName = currentScreen,
             onBackPressed = { navController.navigateUp() },
             onAboutClick = {
-                if (currentScreen != "About") navController.navigate(Screen.About.route)
+                navController.navigate(Screen.About.route)
             })
     }) {
         NavHost(
@@ -56,8 +57,10 @@ fun Navigation() {
             {
                 currentScreen = stringResource(R.string.search)
                 SearchScreen(viewModel) { username ->
+                    //start loading repositories
+                    Log.d("GitSearch nav", "Navigating to user profile from search")
+                    viewModel.onNavigateToUser(username)
                     navController.navigate("${Screen.UserDetail.route}/$username")
-
                 }
             }
 
@@ -66,13 +69,16 @@ fun Navigation() {
                 arguments = listOf(
                     navArgument("username") {
                         type = NavType.StringType
-                    })
+                    }
+                )
             ) {
                 currentScreen = stringResource(R.string.user_detail)
                 UserDetailScreen(
                     viewModel = viewModel,
-                    onClickRepo = { repoName ->
-                        viewModel.onNavigateToRepo(repoName)
+                    onClickRepo = { username, repoName ->
+                        Log.d("GitSearch nav", "Navigating to repo detail from user detail")
+                        //start loading branches and commits, navigate to repo detail
+                        viewModel.onNavigateToRepo(username, repoName)
                         navController.navigate("${Screen.RepoDetail.route}/$repoName")
                     })
             }
@@ -93,13 +99,18 @@ fun Navigation() {
 
             composable(Screen.About.route) {
                 currentScreen = stringResource(id = R.string.about)
-                AboutScreen()
+                AboutScreen {
+                    Log.d("GitSearch nav", "Navigating to author profile from About screen")
+                    viewModel.showAuthorProfile()
+                    viewModel.onNavigateToUser("JakubHerr")
+                    navController.navigate("${Screen.UserDetail.route}/JakubHerr")
+
+                }
             }
         }
     }
 }
 
-//TODO improve
 @Composable
 fun MyAppBar(screenName: String?, onBackPressed: () -> Unit, onAboutClick: () -> Unit) {
     //manually overriding default TopBar colors for a better look
@@ -109,27 +120,31 @@ fun MyAppBar(screenName: String?, onBackPressed: () -> Unit, onAboutClick: () ->
         actionIconContentColor = MaterialTheme.colorScheme.onPrimary
     )
 
-    CenterAlignedTopAppBar(title = { Text(screenName ?: "test") }, actions = {
-        Icon(Icons.Default.Info, "About app",
-            modifier = Modifier
-                .height(40.dp)
-                .width(40.dp)
-                .clickable {
-                    onAboutClick()
-                }
-                .padding(4.dp))
-    }, navigationIcon = {
-        if (screenName != "Search") {
-            Icon(
-                Icons.Default.ArrowBack,
-                contentDescription = "Back arrow",
-                modifier = Modifier
-                    .height(40.dp)
-                    .width(40.dp)
-                    .clickable {
-                        onBackPressed()
-                    }
-                    .padding(4.dp))
+    CenterAlignedTopAppBar(
+        title = { Text(screenName ?: stringResource(R.string.no_title)) },
+        actions = {
+            if (screenName != stringResource(R.string.about))
+                Icon(Icons.Default.Info, stringResource(R.string.about_app_icon_description),
+                    modifier = Modifier
+                        .height(40.dp)
+                        .width(40.dp)
+                        .clickable {
+                            onAboutClick()
+                        }
+                        .padding(4.dp))
+        },
+        navigationIcon = {
+            if (screenName != stringResource(R.string.search)) {
+                Icon(
+                    Icons.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.back_arrow_icon_description),
+                    modifier = Modifier
+                        .height(40.dp)
+                        .width(40.dp)
+                        .clickable {
+                            onBackPressed()
+                        }
+                        .padding(4.dp))
         }
     }, colors = color)
 }

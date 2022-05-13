@@ -35,7 +35,6 @@ class GithubServiceImpl(private val client: HttpClient) : GithubService {
         }.body()
     }
 
-    //TODO call the close() method to free resources before exiting app
     override fun close() {
         client.close()
     }

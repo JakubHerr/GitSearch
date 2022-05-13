@@ -26,6 +26,9 @@ class MainViewModel(private val repository: MainRepository) : ViewModel() {
     private var _commitList = MutableStateFlow(Response<List<CommitDto>>())
     val commitList: StateFlow<Response<List<CommitDto>>> get() = _commitList
 
+    //this state tells SearchScreen when to navigate to user detail
+    //it is set to true when a valid, existing user was loaded
+    //it is set to false during navigation
     private var _validUser = mutableStateOf(false)
     val validUser get() = _validUser
 
@@ -63,15 +66,26 @@ class MainViewModel(private val repository: MainRepository) : ViewModel() {
         }
     }
 
-    fun onNavigateToUser() {
+    //gets called to load repositories for UserDetailScreen
+    fun onNavigateToUser(user: String) {
         _validUser.value = false
-        //onNavigateToUser can only trigger if a valid response with data was received
-        getRepos(_user.value.data!!.login)
+        getRepos(user)
     }
 
-    fun onNavigateToRepo(repo: String) {
-        getCommits(_user.value.data!!.login, repo)
-        getBranches(_user.value.data!!.login, repo)
+    //gets called to load commits and branches for RepoDetailScreen
+    fun onNavigateToRepo(user: String, repo: String) {
+        getCommits(user, repo)
+        getBranches(user, repo)
+    }
+
+    //this function navigates to a predefined valid profile without triggering
+    //navigation from SearchScreen on recomposition
+    fun showAuthorProfile() {
+        viewModelScope.launch {
+            repository.getUser("JakubHerr").collect {
+                _user.value = it
+            }
+        }
     }
 
     //a valid username is max 39 characters long alphanumeric string

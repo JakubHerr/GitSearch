@@ -34,39 +34,63 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun UserDetailScreen(viewModel: MainViewModel, onClickRepo: (String) -> Unit) {
-    val user by viewModel.user.collectAsState()
-    val repos by viewModel.repoList.collectAsState()
+fun UserDetailScreen(viewModel: MainViewModel, onClickRepo: (String, String) -> Unit) {
+    val userResponse by viewModel.user.collectAsState()
+    val repoListResponse by viewModel.repoList.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        UserProfile(response = user)
-        Spacer(
-            modifier = Modifier
-                .height(2.dp)
-                .fillMaxWidth()
-                .background(Color.Black)
-                .padding(8.dp)
-        )
-        RepoList(response = repos, onClickRepo = onClickRepo)
+        when (userResponse) {
+            is Response.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .size(64.dp)
+                )
+            }
+            is Response.Error -> {
+                userResponse.message?.let {
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+            is Response.Success -> {
+                userResponse.data?.let {
+                    UserProfile(user = it)
+                    Spacer(
+                        modifier = Modifier
+                            .height(2.dp)
+                            .fillMaxWidth()
+                            .background(Color.Black)
+                            .padding(8.dp)
+                    )
+                    RepoList(
+                        response = repoListResponse,
+                        username = it.login,
+                        onClickRepo = onClickRepo
+                    )
+                }
+            }
+        }
     }
 }
 
 @Composable
-fun UserProfile(response: Response<UserDto>) {
+fun UserProfile(user: UserDto) {
     var showMore by remember { mutableStateOf(false) }
 
-    response.data?.let { user ->
-        val hasExtraInfo = when {
-            user.bio != null -> true
-            user.company != null -> true
-            user.location != null -> true
-            user.email != null -> true
-            else -> false
-        }
+    val hasExtraInfo = when {
+        user.bio != null -> true
+        user.company != null -> true
+        user.location != null -> true
+        user.email != null -> true
+        else -> false
+    }
 
         Column(modifier = Modifier.animateContentSize()) {
             BasicUserInfo(user = user)
@@ -88,7 +112,7 @@ fun UserProfile(response: Response<UserDto>) {
             }
         }
     }
-}
+
 
 @Composable
 fun BasicUserInfo(user: UserDto) {
@@ -113,12 +137,12 @@ fun BasicUserInfo(user: UserDto) {
                 fontStyle = FontStyle.Italic
             )
             IconText(
-                text = "${user.followers} followers", //TODO extract string with arguments
+                text = stringResource(R.string.followers, user.followers),
                 contentDescription = stringResource(R.string.follower_icon_description),
                 painter = painterResource(id = R.drawable.ic_baseline_people_alt_24)
             )
             IconText(
-                text = "${user.following} following", //TODO extract string with arguments
+                text = stringResource(R.string.following, user.following),
                 contentDescription = stringResource(R.string.following_icon_description),
                 painter = painterResource(id = R.drawable.ic_baseline_emoji_people_24)
             )
@@ -198,7 +222,11 @@ fun UserAvatar(url: String) {
 }
 
 @Composable
-fun RepoList(response: Response<List<RepoDto>>, onClickRepo: (String) -> Unit) {
+fun RepoList(
+    response: Response<List<RepoDto>>,
+    username: String,
+    onClickRepo: (String, String) -> Unit
+) {
     val test = rememberLazyListState()
     Text(stringResource(R.string.repositories))
     when (response) {
@@ -207,7 +235,7 @@ fun RepoList(response: Response<List<RepoDto>>, onClickRepo: (String) -> Unit) {
 
                 response.data?.let { list ->
                     items(list.size) { idx ->
-                        RepoItem(list[idx], onClickRepo)
+                        RepoItem(list[idx], username, onClickRepo)
                     }
                 }
             }
@@ -229,10 +257,10 @@ fun RepoList(response: Response<List<RepoDto>>, onClickRepo: (String) -> Unit) {
 }
 
 @Composable
-fun RepoItem(repo: RepoDto, onClick: (String) -> Unit) {
+fun RepoItem(repo: RepoDto, username: String, onClick: (String, String) -> Unit) {
     ListItem(modifier = Modifier
         .wrapContentHeight()
-        .clickable { onClick(repo.name) }) {
+        .clickable { onClick(username, repo.name) }) {
         Text(
             text = repo.name,
             style = MaterialTheme.typography.bodyMedium,
@@ -244,7 +272,7 @@ fun RepoItem(repo: RepoDto, onClick: (String) -> Unit) {
             .format(repo.updatedAt.toInstant().toEpochMilliseconds())
 
         Text(
-            text = "Updated on $date", //TODO extract string with arguments
+            text = stringResource(R.string.updated_on, date),
             style = MaterialTheme.typography.bodySmall
         )
 
