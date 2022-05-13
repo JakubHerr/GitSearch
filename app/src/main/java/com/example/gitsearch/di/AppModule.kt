@@ -32,7 +32,7 @@ val AppModule = module {
         GithubServiceImpl(get())
     }
     single<MainRepository> {
-        MainRepositoryImpl(get())
+        MainRepositoryImpl(get(), get())
     }
     single {
         MainViewModel(get())

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface MainRepository {
     fun getUser(user: String): Flow<Response<UserDto>>
-    fun getUserRepos(user: String): Flow<Response<List<RepoDto>>>
-    fun getRepoBranches(user: String, repo: String): Flow<Response<List<BranchDto>>>
-    fun getRepoCommits(user: String, repo: String): Flow<Response<List<CommitDto>>>
+    fun getUserRepos(user: String, userId: Long): Flow<Response<List<RepoDto>>>
+    fun getRepoBranches(user: String, repo: String, repoId: Long): Flow<Response<List<BranchDto>>>
+    fun getRepoCommits(user: String, repo: String, repoId: Long): Flow<Response<List<CommitDto>>>
 }

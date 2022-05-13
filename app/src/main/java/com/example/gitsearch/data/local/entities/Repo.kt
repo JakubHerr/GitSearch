@@ -23,3 +23,9 @@ fun Repo.toDto(): RepoDto = RepoDto(
     updatedAt = updatedAt,
     description = description
 )
+
+fun List<Repo>.toRepoDto(): List<RepoDto> {
+    val result = mutableListOf<RepoDto>()
+    this.forEach { result.add(it.toDto()) }
+    return result
+}
