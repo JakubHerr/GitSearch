@@ -10,8 +10,8 @@ data class RepoDto(
     val name: String,
     val description: String?,
     val language: String?,
-    @SerialName("updated_at")
-    val updatedAt: String
+    @SerialName("pushed_at")
+    val pushedAt: String
 )
 
 
@@ -20,7 +20,7 @@ fun RepoDto.toEntity(userId: Long): Repo = Repo(
     userId = userId,
     name = name,
     language = language,
-    updatedAt = updatedAt,
+    pushedAt = pushedAt,
     description = description
 )
 

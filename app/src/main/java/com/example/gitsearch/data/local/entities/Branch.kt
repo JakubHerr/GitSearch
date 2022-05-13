@@ -15,3 +15,9 @@ data class Branch(
 )
 
 fun Branch.toDto(): BranchDto = BranchDto(name = name, protected = protected)
+
+fun List<Branch>.toDto(): List<BranchDto> {
+    val result = mutableListOf<BranchDto>()
+    this.forEach { result.add(it.toDto()) }
+    return result
+}

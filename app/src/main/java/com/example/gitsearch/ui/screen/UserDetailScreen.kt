@@ -269,7 +269,7 @@ fun RepoItem(repo: RepoDto, username: String, onClick: (String, String, Long) ->
         )
 
         val date = SimpleDateFormat("MMM dd yyyy", Locale.US)
-            .format(repo.updatedAt.toInstant().toEpochMilliseconds())
+            .format(repo.pushedAt.toInstant().toEpochMilliseconds())
 
         Text(
             text = stringResource(R.string.updated_on, date),

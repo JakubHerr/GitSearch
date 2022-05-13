@@ -1,6 +1,8 @@
 package com.example.gitsearch.data.repository
 
 import com.example.gitsearch.data.local.CacheDao
+import com.example.gitsearch.data.local.entities.toDto
+import com.example.gitsearch.data.local.entities.toRepoDto
 import com.example.gitsearch.data.remote.GithubService
 import com.example.gitsearch.data.remote.dto.BranchDto
 import com.example.gitsearch.data.remote.dto.RepoDto
@@ -29,7 +31,10 @@ class MainRepositoryImpl(
             } catch (e: ResponseException) {
                 emit(Response.Error(getErrorMessage(e.response.status.value)))
             } catch (e: IOException) {
-                emit(Response.Error(ErrorMsg.NoConnection.message))
+                val cached = dao.getUser(user)
+                if (cached != null) {
+                    emit(Response.Success(cached.toDto()))
+                } else emit(Response.Error(ErrorMsg.NoConnection.message))
             } catch (e: Exception) {
                 emit(Response.Error(ErrorMsg.Unspecified.message))
             }
@@ -46,7 +51,10 @@ class MainRepositoryImpl(
             } catch (e: ResponseException) {
                 emit(Response.Error(getErrorMessage(e.response.status.value)))
             } catch (e: IOException) {
-                emit(Response.Error(ErrorMsg.NoConnection.message))
+                val cashed = dao.getRepos(userId)
+                if (cashed != null) {
+                    emit(Response.Success(cashed.toRepoDto()))
+                } else emit(Response.Error(ErrorMsg.NoConnection.message))
             } catch (e: Exception) {
                 emit(Response.Error(ErrorMsg.Unspecified.message))
             }
@@ -67,7 +75,9 @@ class MainRepositoryImpl(
             } catch (e: ResponseException) {
                 emit(Response.Error(getErrorMessage(e.response.status.value)))
             } catch (e: IOException) {
-                emit(Response.Error(ErrorMsg.NoConnection.message))
+                val cached = dao.getBranches(repoId)
+                if (cached != null && cached.isNotEmpty()) emit(Response.Success(cached.toDto()))
+                else emit(Response.Error(ErrorMsg.NoConnection.message))
             } catch (e: Exception) {
                 emit(Response.Error(ErrorMsg.Unspecified.message))
             }
@@ -88,7 +98,9 @@ class MainRepositoryImpl(
             } catch (e: ResponseException) {
                 emit(Response.Error(getErrorMessage(e.response.status.value)))
             } catch (e: IOException) {
-                emit(Response.Error(ErrorMsg.NoConnection.message))
+                val cached = dao.getCommits(repoId)
+                if (cached != null && cached.isNotEmpty()) emit(Response.Success(cached.toDto()))
+                else emit(Response.Error(ErrorMsg.NoConnection.message))
             } catch (e: Exception) {
                 emit(Response.Error(ErrorMsg.Unspecified.message))
             }

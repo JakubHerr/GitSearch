@@ -18,7 +18,7 @@ data class Commit(
     var date: String = "1970-01-01T00:00:00Z",
 )
 
-fun Commit.toCommitDto(): CommitDto {
+fun Commit.toDto(): CommitDto {
     val author = CommitAuthorDto(name = authorName, email = authorEmail, date = date)
     return CommitDto(
         sha = sha,
@@ -28,4 +28,10 @@ fun Commit.toCommitDto(): CommitDto {
             committer = author
         )
     )
+}
+
+fun List<Commit>.toDto(): List<CommitDto> {
+    val result = mutableListOf<CommitDto>()
+    this.forEach { result.add(it.toDto()) }
+    return result
 }

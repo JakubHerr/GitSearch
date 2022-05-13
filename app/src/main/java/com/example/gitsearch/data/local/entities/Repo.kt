@@ -13,14 +13,14 @@ data class Repo(
     var name: String = "",
     var description: String? = "",
     var language: String? = "",
-    var updatedAt: String = ""
+    var pushedAt: String = ""
 )
 
 fun Repo.toDto(): RepoDto = RepoDto(
     id = id,
     name = name,
     language = language,
-    updatedAt = updatedAt,
+    pushedAt = pushedAt,
     description = description
 )
 
