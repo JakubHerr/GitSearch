@@ -19,13 +19,13 @@ import com.example.gitsearch.ui.core.AppLogo
 import com.example.gitsearch.ui.viewmodel.MainViewModel
 
 @Composable
-fun SearchScreen(viewModel: MainViewModel, onValidUser: (String) -> Unit) {
+fun SearchScreen(viewModel: MainViewModel, onValidUser: (String, Long) -> Unit) {
     val userState by viewModel.user.collectAsState()
     val navigate by viewModel.validUser
 
     if (navigate) LaunchedEffect(Unit) {
         Log.d("SearchScreen", "Valid user detected, navigating...")
-        userState.data?.let { onValidUser(it.login) }
+        userState.data?.let { onValidUser(it.login, it.id) }
     }
 
     Column(

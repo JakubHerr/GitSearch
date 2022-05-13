@@ -1,5 +1,8 @@
 package com.example.gitsearch.di
 
+import androidx.room.Room
+import com.example.gitsearch.data.local.Cache
+import com.example.gitsearch.data.local.CacheDao
 import com.example.gitsearch.data.remote.GithubService
 import com.example.gitsearch.data.remote.GithubServiceImpl
 import com.example.gitsearch.data.repository.MainRepository
@@ -10,6 +13,7 @@ import io.ktor.client.engine.android.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val AppModule = module {
@@ -28,9 +32,20 @@ val AppModule = module {
         GithubServiceImpl(get())
     }
     single<MainRepository> {
-        MainRepositoryImpl(get())
+        MainRepositoryImpl(get(), get())
     }
     single {
         MainViewModel(get())
     }
+
+    single {
+        Room.databaseBuilder(androidContext(), Cache::class.java, "cache").build()
+    }
+    single {
+        provideDao(get())
+    }
+}
+
+fun provideDao(dataBase: Cache): CacheDao {
+    return dataBase.cacheDao
 }

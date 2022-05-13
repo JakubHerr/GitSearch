@@ -34,7 +34,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun UserDetailScreen(viewModel: MainViewModel, onClickRepo: (String, String) -> Unit) {
+fun UserDetailScreen(viewModel: MainViewModel, onClickRepo: (String, String, Long) -> Unit) {
     val userResponse by viewModel.user.collectAsState()
     val repoListResponse by viewModel.repoList.collectAsState()
 
@@ -225,7 +225,7 @@ fun UserAvatar(url: String) {
 fun RepoList(
     response: Response<List<RepoDto>>,
     username: String,
-    onClickRepo: (String, String) -> Unit
+    onClickRepo: (String, String, Long) -> Unit
 ) {
     val test = rememberLazyListState()
     Text(stringResource(R.string.repositories))
@@ -257,10 +257,10 @@ fun RepoList(
 }
 
 @Composable
-fun RepoItem(repo: RepoDto, username: String, onClick: (String, String) -> Unit) {
+fun RepoItem(repo: RepoDto, username: String, onClick: (String, String, Long) -> Unit) {
     ListItem(modifier = Modifier
         .wrapContentHeight()
-        .clickable { onClick(username, repo.name) }) {
+        .clickable { onClick(username, repo.name, repo.id) }) {
         Text(
             text = repo.name,
             style = MaterialTheme.typography.bodyMedium,
@@ -269,7 +269,7 @@ fun RepoItem(repo: RepoDto, username: String, onClick: (String, String) -> Unit)
         )
 
         val date = SimpleDateFormat("MMM dd yyyy", Locale.US)
-            .format(repo.updatedAt.toInstant().toEpochMilliseconds())
+            .format(repo.pushedAt.toInstant().toEpochMilliseconds())
 
         Text(
             text = stringResource(R.string.updated_on, date),

@@ -56,10 +56,10 @@ fun Navigation() {
             composable(Screen.Search.route)
             {
                 currentScreen = stringResource(R.string.search)
-                SearchScreen(viewModel) { username ->
+                SearchScreen(viewModel) { username, userId ->
                     //start loading repositories
                     Log.d("GitSearch nav", "Navigating to user profile from search")
-                    viewModel.onNavigateToUser(username)
+                    viewModel.onNavigateToUser(username, userId)
                     navController.navigate("${Screen.UserDetail.route}/$username")
                 }
             }
@@ -75,10 +75,10 @@ fun Navigation() {
                 currentScreen = stringResource(R.string.user_detail)
                 UserDetailScreen(
                     viewModel = viewModel,
-                    onClickRepo = { username, repoName ->
+                    onClickRepo = { username, repoName, repoId ->
                         Log.d("GitSearch nav", "Navigating to repo detail from user detail")
                         //start loading branches and commits, navigate to repo detail
-                        viewModel.onNavigateToRepo(username, repoName)
+                        viewModel.onNavigateToRepo(username, repoName, repoId)
                         navController.navigate("${Screen.RepoDetail.route}/$repoName")
                     })
             }
@@ -102,7 +102,7 @@ fun Navigation() {
                 AboutScreen {
                     Log.d("GitSearch nav", "Navigating to author profile from About screen")
                     viewModel.showAuthorProfile()
-                    viewModel.onNavigateToUser("JakubHerr")
+                    viewModel.onNavigateToUser("JakubHerr", 25185228)
                     navController.navigate("${Screen.UserDetail.route}/JakubHerr")
 
                 }

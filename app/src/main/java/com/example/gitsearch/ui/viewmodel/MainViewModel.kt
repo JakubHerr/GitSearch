@@ -42,40 +42,40 @@ class MainViewModel(private val repository: MainRepository) : ViewModel() {
         }
     }
 
-    private fun getRepos(user: String) {
+    private fun getRepos(user: String, userId: Long) {
         viewModelScope.launch {
-            repository.getUserRepos(user).collect {
+            repository.getUserRepos(user, userId).collect {
                 _repoList.value = it
             }
         }
     }
 
-    private fun getCommits(user: String, repo: String) {
+    private fun getCommits(user: String, repo: String, repoId: Long) {
         viewModelScope.launch {
-            repository.getRepoCommits(user, repo).collect {
+            repository.getRepoCommits(user, repo, repoId).collect {
                 _commitList.value = it
             }
         }
     }
 
-    private fun getBranches(user: String, repo: String) {
+    private fun getBranches(user: String, repo: String, repoId: Long) {
         viewModelScope.launch {
-            repository.getRepoBranches(user, repo).collect {
+            repository.getRepoBranches(user, repo, repoId).collect {
                 _branchList.value = it
             }
         }
     }
 
     //gets called to load repositories for UserDetailScreen
-    fun onNavigateToUser(user: String) {
+    fun onNavigateToUser(user: String, userId: Long) {
         _validUser.value = false
-        getRepos(user)
+        getRepos(user, userId)
     }
 
     //gets called to load commits and branches for RepoDetailScreen
-    fun onNavigateToRepo(user: String, repo: String) {
-        getCommits(user, repo)
-        getBranches(user, repo)
+    fun onNavigateToRepo(user: String, repo: String, repoId: Long) {
+        getCommits(user, repo, repoId)
+        getBranches(user, repo, repoId)
     }
 
     //this function navigates to a predefined valid profile without triggering
