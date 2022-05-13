@@ -63,7 +63,7 @@ fun BranchList(list: List<BranchDto>) {
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold
     )
-    LazyColumn {
+    LazyColumn(modifier = Modifier.fillMaxHeight(0.3f)) {
         items(list.size) { idx ->
             Text(list[idx].name, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
         }

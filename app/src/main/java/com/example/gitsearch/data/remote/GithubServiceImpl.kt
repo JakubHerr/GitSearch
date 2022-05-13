@@ -20,6 +20,7 @@ class GithubServiceImpl(private val client: HttpClient) : GithubService {
         return client.get {
             url("$baseUrl/users/$user/repos")
             parameter("sort", "pushed")
+            parameter("per_page", "100")
         }.body()
     }
 
