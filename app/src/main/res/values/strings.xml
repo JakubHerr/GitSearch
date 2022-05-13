@@ -1,3 +1,35 @@
 <resources>
     <string name="app_name">Git Search</string>
+    <string name="search_icon_description">Search icon</string>
+    <string name="search">Search</string>
+    <string name="username_prompt">Enter a username to search</string>
+    <string name="last_ten_commits">Last 10 commits on master:</string>
+    <string name="user_avatar">User avatar</string>
+    <string name="repositories">Repositories:</string>
+    <string name="invalid_username">You have entered an invalid username</string>
+    <string name="gitsearch">GitSearch</string>
+    <string name="gitsearch_description">GitSearch is a simple list-detail app written in Kotlin, it uses: \nJetpack Compose for UI \nKtor for networking \nKoin for dependency injection\nGlide and Landscapist for image loading\nMaterial3</string>
+    <string name="about">About</string>
+    <string name="user_detail">User detail</string>
+    <string name="show_more">Show more</string>
+    <string name="show_less">Show less</string>
+    <string name="follower_icon_description">follower icon</string>
+    <string name="following_icon_description">following icon</string>
+    <string name="company_icon_description">company icon</string>
+    <string name="location_icon_description">location icon</string>
+    <string name="email_icon_description">email icon</string>
+    <string name="error_image_description">Error image</string>
+    <string name="no_error_message">Error: no Error message found</string>
+    <string name="no_repositories_message">This user does not have any repositories yet</string>
+    <string name="gitsearch_logo_description">Gitsearch logo</string>
+    <string name="no_title">No title</string>
+    <string name="about_app_icon_description">About app</string>
+    <string name="back_arrow_icon_description">Back arrow</string>
+    <string name="branches">Branches:</string>
+    <string name="followers">%1$d followers</string>
+    <string name="following">%1$d following</string>
+    <string name="updated_on">Updated on %1$s</string>
+    <string name="user_does_not_exist">User does not exist</string>
+    <string name="author">Author: Jakub Herrmann</string>
+    <string name="github_shortcut">jump to GitHub profile</string>
 </resources>
