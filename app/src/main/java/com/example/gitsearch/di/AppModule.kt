@@ -33,4 +33,15 @@ val AppModule = module {
     single {
         MainViewModel(get())
     }
+
+//    single {
+//        Room.databaseBuilder(androidContext(),Cache::class.java,"cache").build()
+//    }
+//    single {
+//        provideDao(get())
+//    }
 }
+
+//fun provideDao(dataBase: Cache): CacheDao {
+//    return dataBase.cacheDao
+//}

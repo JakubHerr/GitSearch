@@ -7,13 +7,13 @@ import com.example.gitsearch.data.remote.dto.RepoDto
 @Entity(tableName = "repo")
 data class Repo(
     @PrimaryKey(autoGenerate = false)
-    val id: Long,
-    val userId: Long, //links repository to its owner
+    var id: Long = 0L,
+    var userId: Long = 0L, //links repository to its owner
 
-    val name: String,
-    val description: String?,
-    val language: String?,
-    val updatedAt: String
+    var name: String = "",
+    var description: String? = "",
+    var language: String? = "",
+    var updatedAt: String = ""
 )
 
 fun Repo.toDto(): RepoDto = RepoDto(

@@ -6,17 +6,17 @@ import com.example.gitsearch.data.remote.dto.UserDto
 
 @Entity(tableName = "user")
 data class User(
-    @PrimaryKey(autoGenerate = false)
-    val id: Long,
-    val login: String,
-    val avatarUrl: String,
-    val name: String?,
-    val company: String?,
-    val location: String?,
-    val email: String?,
-    val bio: String?,
-    val followers: Int,
-    val following: Int
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0L,
+    var login: String = "",
+    var avatarUrl: String = "",
+    var name: String? = "",
+    var company: String? = "",
+    var location: String? = "",
+    var email: String? = "",
+    var bio: String? = "",
+    var followers: Int = 0,
+    var following: Int = 0
 )
 
 fun User.toDto(): UserDto = UserDto(
