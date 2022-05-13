@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -48,6 +49,7 @@ fun UserDetailScreen(viewModel: MainViewModel, onClickRepo: (String) -> Unit) {
                 .height(2.dp)
                 .fillMaxWidth()
                 .background(Color.Black)
+                .padding(8.dp)
         )
         RepoList(response = repos, onClickRepo = onClickRepo)
     }
@@ -77,7 +79,10 @@ fun UserProfile(response: Response<UserDto>) {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(onClick = { showMore = !showMore }) {
-                        Text(if (showMore) "Show more" else "Show less")
+                        Text(
+                            if (showMore) stringResource(R.string.show_less)
+                            else stringResource(R.string.show_more)
+                        )
                     }
                 }
             }
@@ -108,13 +113,13 @@ fun BasicUserInfo(user: UserDto) {
                 fontStyle = FontStyle.Italic
             )
             IconText(
-                text = "${user.followers} followers",
-                contentDescription = "follower icon",
+                text = "${user.followers} followers", //TODO extract string with arguments
+                contentDescription = stringResource(R.string.follower_icon_description),
                 painter = painterResource(id = R.drawable.ic_baseline_people_alt_24)
             )
             IconText(
-                text = "${user.following} following",
-                contentDescription = "following icon",
+                text = "${user.following} following", //TODO extract string with arguments
+                contentDescription = stringResource(R.string.following_icon_description),
                 painter = painterResource(id = R.drawable.ic_baseline_emoji_people_24)
             )
 
@@ -129,28 +134,24 @@ fun ExtraUserInfo(user: UserDto, modifier: Modifier = Modifier) {
         user.company?.let {
             IconText(
                 text = it,
-                contentDescription = "company icon",
-                painter = painterResource(
-                    id = R.drawable.ic_baseline_location_city_24
-                ),
+                contentDescription = stringResource(R.string.company_icon_description),
+                painter = painterResource(id = R.drawable.ic_baseline_location_city_24),
                 modifier = Modifier.padding(0.dp, 8.dp)
             )
         }
         user.location?.let {
             IconText(
                 text = it,
-                contentDescription = "location icon",
-                painter = painterResource(
-                    id = R.drawable.ic_baseline_location_on_24
-                ),
+                contentDescription = stringResource(R.string.location_icon_description),
+                painter = painterResource(id = R.drawable.ic_baseline_location_on_24),
                 modifier = Modifier.padding(0.dp, 8.dp)
             )
         }
         user.email?.let {
             IconText(
-                text = it, contentDescription = "email icon", painter = painterResource(
-                    id = R.drawable.ic_baseline_email_24
-                ),
+                text = it,
+                contentDescription = stringResource(R.string.email_icon_description),
+                painter = painterResource(id = R.drawable.ic_baseline_email_24),
                 modifier = Modifier.padding(0.dp, 8.dp)
             )
         }
@@ -179,8 +180,7 @@ fun UserAvatar(url: String) {
     GlideImage(
         imageModel = url,
         modifier = Modifier
-            .width(128.dp)
-            .height(128.dp)
+            .size(128.dp)
             .clip(CircleShape)
             .background(Color.DarkGray),
         contentScale = ContentScale.Crop,
@@ -190,7 +190,7 @@ fun UserAvatar(url: String) {
         failure = {
             Image(
                 painter = painterResource(id = R.drawable.ic_baseline_wifi_off_24),
-                contentDescription = "Error image",
+                contentDescription = stringResource(R.string.error_image_description),
                 modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -199,10 +199,12 @@ fun UserAvatar(url: String) {
 
 @Composable
 fun RepoList(response: Response<List<RepoDto>>, onClickRepo: (String) -> Unit) {
+    val test = rememberLazyListState()
     Text(stringResource(R.string.repositories))
     when (response) {
         is Response.Success -> Row {
-            LazyColumn {
+            LazyColumn(state = test) {
+
                 response.data?.let { list ->
                     items(list.size) { idx ->
                         RepoItem(list[idx], onClickRepo)
@@ -217,10 +219,12 @@ fun RepoList(response: Response<List<RepoDto>>, onClickRepo: (String) -> Unit) {
                 )
             )
         }
-        is Response.Error -> Text(text = response.message ?: "Error: no Error message found")
+        is Response.Error -> Text(
+            text = response.message ?: stringResource(R.string.no_error_message)
+        )
     }
     response.data?.let { list ->
-        if (list.isEmpty()) Text(text = "This user does not have any repositories yet")
+        if (list.isEmpty()) Text(text = stringResource(R.string.no_repositories_message))
     }
 }
 
@@ -235,13 +239,12 @@ fun RepoItem(repo: RepoDto, onClick: (String) -> Unit) {
             fontWeight = FontWeight.Bold,
             color = Color.Blue
         )
-        //not a very efficient way to turn an ISO 8601 date string into a different string
-        //TODO look for a better solution
+
         val date = SimpleDateFormat("MMM dd yyyy", Locale.US)
             .format(repo.updatedAt.toInstant().toEpochMilliseconds())
 
         Text(
-            text = "Updated on $date",
+            text = "Updated on $date", //TODO extract string with arguments
             style = MaterialTheme.typography.bodySmall
         )
 

@@ -32,6 +32,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn" //Opt into Material3 experimental API
     }
     buildFeatures {
         compose true
@@ -90,6 +91,9 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
 
+    //status bar color change
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.17.0"
+
     //Memory leak detection
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
 
@@ -101,3 +105,4 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     implementation "io.insert-koin:koin-test:$koin_version"
 }
+

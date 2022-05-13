@@ -22,7 +22,7 @@ import com.example.gitsearch.ui.core.ListItem
 import com.example.gitsearch.ui.viewmodel.MainViewModel
 
 @Composable
-fun RepoDetailScreen(viewModel: MainViewModel, repoName: String?) {
+fun RepoDetailScreen(viewModel: MainViewModel) {
     val branchList by viewModel.branchList.collectAsState()
     val commitList by viewModel.commitList.collectAsState()
 
@@ -32,14 +32,18 @@ fun RepoDetailScreen(viewModel: MainViewModel, repoName: String?) {
             .padding(16.dp)
     ) {
         when (branchList) {
-            is Response.Error -> Text(branchList.message ?: "️Error: no error message")
+            is Response.Error -> Text(
+                branchList.message ?: stringResource(R.string.no_error_message)
+            )
             is Response.Loading -> CircularProgressIndicator()
             is Response.Success -> branchList.data?.let { BranchList(list = it) }
         }
 
         Text(stringResource(R.string.last_ten_commits), style = MaterialTheme.typography.bodyMedium)
         when (commitList) {
-            is Response.Error -> Text(branchList.message ?: "️Error: no error message")
+            is Response.Error -> Text(
+                branchList.message ?: stringResource(R.string.no_error_message)
+            )
             is Response.Loading -> CircularProgressIndicator()
             is Response.Success -> commitList.data?.let { CommitList(list = it) }
         }
